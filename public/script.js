@@ -7,6 +7,7 @@ class Vec {
         this.x = x;
         this.y = y;
     }
+    //randomises ball direction upon collision
     get len (){
         return Math.sqrt(this.x * this.x + this.y * this.y);
     }
@@ -18,6 +19,7 @@ class Vec {
 }
 
 class Rect {
+    //create rectangle components
     constructor(w,h){
         this.pos = new Vec;
         this.size = new Vec(w, h);
@@ -37,6 +39,7 @@ class Rect {
 }
 
 class Ball extends Rect{
+    //ball component
     constructor(){
         super(10,10);
         this.vel = new Vec;
@@ -44,6 +47,7 @@ class Ball extends Rect{
 }
 
 class Player extends Rect {
+    //player component
     constructor(){
         super(20,100);
         this.score = 0;
@@ -51,11 +55,15 @@ class Player extends Rect {
 }
 
 class Pong {
+    //Pong game
     constructor(canvas){
+        //draw the background
         this._canvas = canvas;
         this.context = canvas.getContext('2d');
 
         this.ball = new Ball;
+
+        //initial ball position and random starting path
 
         this.ball.pos.x = WIDTH/2;
         this.ball.pos.y = HEIGHT/2;
@@ -64,6 +72,7 @@ class Pong {
         this.ball.vel.y = 300 * (Math.random() * 2 - 1);
         this.ball.vel.len = 200;
 
+        //score limit
         this.scoreLimit = 1;
 
         this.players = [
@@ -71,6 +80,7 @@ class Pong {
             new Player,
         ];
 
+        //players starting positions
         this.players[0].pos.x = 40;
         this.players[1].pos.x = WIDTH - 40;
         this.players.forEach(player => {
@@ -79,6 +89,7 @@ class Pong {
 
         let lastTime;
 
+        //useing time to calculate how much the screen should be updating
         const callback = (millis) =>{
             if(lastTime){
                 this.update((millis - lastTime) / 1000);
@@ -92,7 +103,9 @@ class Pong {
     }
 
     collide(player, ball){
+        //collision logic - checking if ball perimeter has cross panel perimeter
         if((player.left < ball.right) && (player.right > ball.left) && (player.top < ball.bottom) && (player.bottom > ball.top)){
+            //if collision detected - returns ball back in oposite direct + random element to ball tragectory
             const len = this.ball.vel.len;
             this.ball.vel.x = -this.ball.vel.x;
             this.ball.vel.y += 500 * (Math.random() - 0.5);
@@ -101,6 +114,7 @@ class Pong {
     }
 
     draw(){
+        //draws ball and player and score elements
         this.context.fillStyle = '#000';
         this.context.fillRect(0,0,WIDTH, HEIGHT);
 
@@ -112,6 +126,8 @@ class Pong {
     }
 
     drawScore(){
+        //simple score drawing - two text elements showiong the players score with seperator in the middle
+
         // var scale = window.devicePixelRatio; 
         // console.log(scale)
         let player = this.players[0].score;
@@ -128,11 +144,13 @@ class Pong {
     }
 
     drawRect(rect){
+        //used to draw the players and ball elements
         this.context.fillStyle = '#fff';
         this.context.fillRect(rect.left, rect.top, rect.size.x, rect.size.y);
     }
 
     reset(){
+        //if ball goes out of bounds(player scores) reset the positioning of players and ball
         this.ball.pos.x = WIDTH/2;
         this.ball.pos.y = HEIGHT/2;
         this.ball.vel.x = 300 * (Math.random() > .5 ? 1 : -1);
@@ -141,6 +159,7 @@ class Pong {
     }
 
     update (deltaTime){
+        //updates the ball position and score 
         this.ball.pos.x += this.ball.vel.x * deltaTime;
         this.ball.pos.y += this.ball.vel.y * deltaTime;
     
@@ -160,6 +179,8 @@ class Pong {
             this.ball.vel.y = -this.ball.vel.y;
         }
 
+        //checks if colision has taken place for each itteration
+
         this.players[1].pos.y = this.ball.pos.y;
         this.players.forEach(player => {
             this.collide(player, this.ball);
@@ -169,6 +190,7 @@ class Pong {
     
     }
 }
+//creating the pong game and allowing user to move players paddel
 const pong = new Pong(canvas);
 canvas.addEventListener('mousemove', event => {
     pong.players[0].pos.y = event.offsetY;
