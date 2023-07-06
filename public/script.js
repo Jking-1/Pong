@@ -1,6 +1,14 @@
 const canvas = document.getElementById('pong');
+const menu = document.getElementById('menu');
 const WIDTH = canvas.width;
 const HEIGHT = canvas.height;
+const MENUHEIGHT = menu.height;
+const MENUWIDTH= menu.width;
+let DIFFICULTY =5;
+
+let menuOpen = false;
+let ballVelX;
+let ballVelY;
 
 class Vec {
     constructor(x=0, y=0){
@@ -54,12 +62,36 @@ class Player extends Rect {
     }
 }
 
+// class Menu {
+//     constructor(menu){
+//         console.log("in menu")
+//         const ballVelX = pong.ball.vel.x;
+//         const ballVelY = pong.ball.vel.y;
+//         pong.ball.vel.x = 0;
+//         pong.ball.vel.y = 0;
+//         canvas.removeEventListener('mousemove', event);
+//         this._canvas = menu;
+//         this.context = menu.getContext('2d');
+//         this.drawMenu()
+//     }
+//     drawMenu () {
+//         console.log("drawuing")
+//         //draws ball and player and score elements
+//         this.context.fillStyle = 'white';
+//         this.context.fillRect(0,0,WIDTH, HEIGHT);
+    
+//     }
+// }
+
+
 class Pong {
     //Pong game
-    constructor(canvas){
+    constructor(canvas, menu){
         //draw the background
-        this._canvas = canvas;
+        //this._canvas = canvas;
         this.context = canvas.getContext('2d');
+
+        this.menuContext = menu.getContext('2d');
 
         this.ball = new Ball;
 
@@ -68,12 +100,16 @@ class Pong {
         this.ball.pos.x = WIDTH/2;
         this.ball.pos.y = HEIGHT/2;
 
-        this.ball.vel.x = 300 * (Math.random() > .5 ? 1 : -1);
-        this.ball.vel.y = 300 * (Math.random() * 2 - 1);
+        const heading = this.randomNumberBetween(0, 2 * Math.PI);
+
+        // this.ball.vel.x = 300 * (Math.random() > .5 ? 1 : -1);
+        // this.ball.vel.y = 300 * (Math.random() * 2 - 1);
+        this.ball.vel.x = Math.cos(heading);
+        this.ball.vel.y = Math.sin(heading); 
         this.ball.vel.len = 200;
 
         //score limit
-        this.scoreLimit = 1;
+        this.scoreLimit = 3;
 
         this.players = [
             new Player,
@@ -81,7 +117,7 @@ class Pong {
         ];
 
         //players starting positions
-        this.players[0].pos.x = 40;
+        this.players[0].pos.x = 40;       
         this.players[1].pos.x = WIDTH - 40;
         this.players.forEach(player => {
             player.pos.y = HEIGHT / 2;
@@ -102,6 +138,35 @@ class Pong {
 
     }
 
+    pause () {
+        let resume = document.getElementById('resume');
+        if(menuOpen){
+            this.ball.vel.x = ballVelX;
+            this.ball.vel.y = ballVelY; 
+            menuOpen = false;
+            canvas.style.display = "block"
+            // let resume = document.getElementById('resume');
+            resume.style.display = "none";
+            canvas.addEventListener('mousemove', changeUserPosition); 
+
+            //menu.style.display = "none"
+        }else{
+            ballVelX = this.ball.vel.x;
+            ballVelY = this.ball.vel.y;
+            this.ball.vel.x = 0;
+            this.ball.vel.y = 0;
+            menuOpen = true;
+            canvas.style.display = "none"
+            //menu.style.display = "block"
+            resume.style.display = "block";
+        }
+
+    }
+
+    randomNumberBetween (min, max){
+        return Math.random() * (max - min) + min
+    }
+
     collide(player, ball){
         //collision logic - checking if ball perimeter has cross panel perimeter
         if((player.left < ball.right) && (player.right > ball.left) && (player.top < ball.bottom) && (player.bottom > ball.top)){
@@ -109,7 +174,7 @@ class Pong {
             const len = this.ball.vel.len;
             this.ball.vel.x = -this.ball.vel.x;
             this.ball.vel.y += 500 * (Math.random() - 0.5);
-            this.ball.vel.len = len *  1.1;
+            this.ball.vel.len = len *  1.01;
         }
     }
 
@@ -117,6 +182,8 @@ class Pong {
         //draws ball and player and score elements
         this.context.fillStyle = '#000';
         this.context.fillRect(0,0,WIDTH, HEIGHT);
+        this.menuContext.fillStyle = '#000';
+        this.menuContext.fillRect(0,0,MENUWIDTH, MENUHEIGHT);
 
         this.drawRect(this.ball);
         
@@ -153,9 +220,32 @@ class Pong {
         //if ball goes out of bounds(player scores) reset the positioning of players and ball
         this.ball.pos.x = WIDTH/2;
         this.ball.pos.y = HEIGHT/2;
-        this.ball.vel.x = 300 * (Math.random() > .5 ? 1 : -1);
-        this.ball.vel.y = 300 * (Math.random() * 2 + 1);
+        // this.ball.vel.x = 300 * (Math.random() > .5 ? 1 : -1);
+        // this.ball.vel.y = 300 * (Math.random() * 2 + 1);
+        const heading = this.randomNumberBetween(0, 2 * Math.PI);
+        this.ball.vel.x = Math.cos(heading);
+        this.ball.vel.y = Math.sin(heading);
         this.ball.vel.len = 200;
+    }
+
+    restart() {
+        this.players[0].score = 0;
+        this.players[1].score = 0;
+        this.ball.pos.x = WIDTH/2;
+        this.ball.pos.y = HEIGHT/2;
+        // this.ball.vel.x = 300 * (Math.random() > .5 ? 1 : -1);
+        // this.ball.vel.y = 300 * (Math.random() * 2 + 1);
+        const heading = this.randomNumberBetween(0, 2 * Math.PI);
+        this.ball.vel.x = Math.cos(heading);
+        this.ball.vel.y = Math.sin(heading);
+        this.ball.vel.len = 200;
+        DIFFICULTY = 5;
+        menuOpen = false;
+        canvas.style.display = "block"
+        // let resume = document.getElementById('resume');
+        let resume = document.getElementById('resume');
+        resume.style.display = "none";
+        canvas.addEventListener('mousemove', changeUserPosition);
     }
 
     update (deltaTime){
@@ -167,21 +257,21 @@ class Pong {
             const playerId = this.ball.left < 0 ? 1 : 0;
             this.players[playerId].score++;
             if(this.players[playerId].score == this.scoreLimit){
-                if(playerId === 0){
-                    console.log("You won!!")
-                }else{
-                    console.log("You lost :(")
-                }
+                canvas.style.display = "none";
+                let gameOver = document.getElementById('game-over');
+                gameOver.style.display = "block"
             }
             this.reset();
-        }
+        }    
         if(this.ball.top < 0 || this.ball.bottom > HEIGHT){
             this.ball.vel.y = -this.ball.vel.y;
         }
 
         //checks if colision has taken place for each itteration
-
-        this.players[1].pos.y = this.ball.pos.y;
+        //increase difficulty value to make game harder
+        const difficulty = 5;
+        this.players[1].pos.y += DIFFICULTY * deltaTime * (this.ball.pos.y - this.players[1].pos.y);
+        //this.players[1].pos.y = this.ball.pos.y;
         this.players.forEach(player => {
             this.collide(player, this.ball);
         })
@@ -190,13 +280,47 @@ class Pong {
     
     }
 }
-//creating the pong game and allowing user to move players paddel
-const pong = new Pong(canvas);
-canvas.addEventListener('mousemove', event => {
+
+function changeUserPosition(event){
     pong.players[0].pos.y = event.offsetY;
+}
+//creating the pong game and allowing user to move players paddel
+const pong = new Pong(canvas, menu);
+canvas.addEventListener('mousemove', changeUserPosition);
+document.addEventListener('keyup', event => {
+    if (event.code === 'Space') {
+        if(! menuOpen){ 
+            canvas.removeEventListener('mousemove', changeUserPosition);
+        }else{
+            canvas.addEventListener('mousemove', changeUserPosition); 
+        }
+        pong.pause();
+    }
 })
 
+function startGame() {
+    pong.pause();
+}
 
+function restartGame() {
+    console.log("restarting");
+    pong.restart();
+}
+
+function easy () {
+    DIFFICULTY = 2;
+    pong.pause();
+}
+
+function medium () {
+    DIFFICULTY = 5;
+    pong.pause();
+}
+
+function hard () {
+    DIFFICULTY = 8;
+    pong.pause();
+}
 
 
 

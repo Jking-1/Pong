@@ -5,8 +5,79 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pong</title>
+    <style>
+        body {
+            align-items: center;
+            background: #202020;
+            display: flex;
+            margin: 0;
+            width: 100%;
+        }
+        canvas {
+            border: solid 1px #fff;
+            border-left: none;
+            border-right: none;
+            image-rendering: pixelated;
+            height: 100%;
+            margin: 0 auto;
+        }
+        #resume, #game-over {
+            font-family:Arial, Helvetica, sans-serif;
+            color: #ffffff;
+            padding: 20px;
+            position: fixed;
+            top: 20%;
+            left:50%;
+            margin-top: -100px;
+            margin-left: -100px;
+            height:200px;
+            width:250px;
+            text-align: center;
+        }
+
+        #resume a, #game-over a {
+            border: 3px solid #ffffff;
+            color: #ffffff;
+            text-decoration: none;
+            padding: 10px;
+            border-radius: 15px;
+            cursor: pointer;
+            display: block;
+            width: 200px;
+            text-align: center;
+            font-size:2em;
+            display: inline-block;
+        }
+ 
+#start a:hover, #game-over a:hover { background-color: #ffffff; color: #1bafdb; }
+    </style>
 </head>
 <body>
-    <canvas id="pong" width="600" height="400"></canvas>
+    <canvas id="menu" width="600" height="400" style="display:none"></canvas>
+    <canvas id="pong" width="600" height="400" style="display:block"></canvas>
+    <div id="resume" style="display: none;">
+        <a href="#" onclick="startGame()"> Resume</a>
+        <br/><br/>
+        <a href="#" onclick="restartGame()"> Restart</a>
+        <br/><br/>
+        <a href="#"> Difficulty</a>
+        <br/><br/>
+        <a href="#" onclick="easy()"> Easy</a>
+        <a href="#" onclick="medium()"> Medium</a>
+        <a href="#" onclick="hard()"> Hard</a>
+        <!-- <button id="start"> Restart</button>
+        <li>
+            <a href="#">Easy</a>
+            <a href="#">Medium</a>
+            <a href="#">Hard</a>
+        </li> -->
+    </div>
+    <div id ="game-over" style="display: none;">
+        <a href="#"> GAME OVER</a>
+        <br/><br/>
+        <a href="#" onclick="restartGame()"> Restart</a>
+    </div>
+    <!-- <canvas id="menu" width="600" height="400"></canvas> -->
     <script src="script.js"></script>
+</body>
 </html>
