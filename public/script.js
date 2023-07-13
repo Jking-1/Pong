@@ -1,12 +1,13 @@
 const canvas = document.getElementById('pong');
-const menu = document.getElementById('menu');
+// const menu = document.getElementById('menu');
 const WIDTH = canvas.width;
 const HEIGHT = canvas.height;
-const MENUHEIGHT = menu.height;
-const MENUWIDTH= menu.width;
+// const MENUHEIGHT = menu.height;
+// const MENUWIDTH= menu.width;
 let DIFFICULTY =5;
 
-let menuOpen = false;
+let MENUOPEN = false;
+let GAMEOVER = false;
 let ballVelX;
 let ballVelY;
 
@@ -62,26 +63,6 @@ class Player extends Rect {
     }
 }
 
-// class Menu {
-//     constructor(menu){
-//         console.log("in menu")
-//         const ballVelX = pong.ball.vel.x;
-//         const ballVelY = pong.ball.vel.y;
-//         pong.ball.vel.x = 0;
-//         pong.ball.vel.y = 0;
-//         canvas.removeEventListener('mousemove', event);
-//         this._canvas = menu;
-//         this.context = menu.getContext('2d');
-//         this.drawMenu()
-//     }
-//     drawMenu () {
-//         console.log("drawuing")
-//         //draws ball and player and score elements
-//         this.context.fillStyle = 'white';
-//         this.context.fillRect(0,0,WIDTH, HEIGHT);
-    
-//     }
-// }
 
 
 class Pong {
@@ -91,7 +72,7 @@ class Pong {
         //this._canvas = canvas;
         this.context = canvas.getContext('2d');
 
-        this.menuContext = menu.getContext('2d');
+        // this.menuContext = menu.getContext('2d');
 
         this.ball = new Ball;
 
@@ -101,7 +82,7 @@ class Pong {
         this.ball.pos.y = HEIGHT/2;
 
         const heading = this.randomNumberBetween(0, 2 * Math.PI);
-
+   
         // this.ball.vel.x = 300 * (Math.random() > .5 ? 1 : -1);
         // this.ball.vel.y = 300 * (Math.random() * 2 - 1);
         this.ball.vel.x = Math.cos(heading);
@@ -109,7 +90,7 @@ class Pong {
         this.ball.vel.len = 200;
 
         //score limit
-        this.scoreLimit = 3;
+        this.scoreLimit = 1 ;
 
         this.players = [
             new Player,
@@ -140,25 +121,25 @@ class Pong {
 
     pause () {
         let resume = document.getElementById('resume');
-        if(menuOpen){
+        if(GAMEOVER){return};
+        if(MENUOPEN){
             this.ball.vel.x = ballVelX;
             this.ball.vel.y = ballVelY; 
-            menuOpen = false;
+            MENUOPEN = false;
             canvas.style.display = "block"
             // let resume = document.getElementById('resume');
             resume.style.display = "none";
             canvas.addEventListener('mousemove', changeUserPosition); 
 
-            //menu.style.display = "none"
         }else{
             ballVelX = this.ball.vel.x;
             ballVelY = this.ball.vel.y;
             this.ball.vel.x = 0;
             this.ball.vel.y = 0;
-            menuOpen = true;
+            MENUOPEN = true;
             canvas.style.display = "none"
-            //menu.style.display = "block"
             resume.style.display = "block";
+            
         }
 
     }
@@ -182,8 +163,8 @@ class Pong {
         //draws ball and player and score elements
         this.context.fillStyle = '#000';
         this.context.fillRect(0,0,WIDTH, HEIGHT);
-        this.menuContext.fillStyle = '#000';
-        this.menuContext.fillRect(0,0,MENUWIDTH, MENUHEIGHT);
+        // this.menuContext.fillStyle = '#000';
+        // this.menuContext.fillRect(0,0,MENUWIDTH, MENUHEIGHT);
 
         this.drawRect(this.ball);
         
@@ -239,12 +220,16 @@ class Pong {
         this.ball.vel.x = Math.cos(heading);
         this.ball.vel.y = Math.sin(heading);
         this.ball.vel.len = 200;
-        DIFFICULTY = 5;
-        menuOpen = false;
+        MENUOPEN = false;
+        GAMEOVER = false;
         canvas.style.display = "block"
         // let resume = document.getElementById('resume');
         let resume = document.getElementById('resume');
         resume.style.display = "none";
+        let gameOverLoser = document.getElementById('game-over-loser');
+        gameOverLoser.style.display = "none"
+        let gameOverWinner = document.getElementById('game-over-winner');
+        gameOverWinner.style.display = "none"
         canvas.addEventListener('mousemove', changeUserPosition);
     }
 
@@ -258,8 +243,14 @@ class Pong {
             this.players[playerId].score++;
             if(this.players[playerId].score == this.scoreLimit){
                 canvas.style.display = "none";
-                let gameOver = document.getElementById('game-over');
-                gameOver.style.display = "block"
+                GAMEOVER = true; 
+                if(playerId === 0){
+                    let gameOver = document.getElementById('game-over-winner');
+                    gameOver.style.display = "block"
+                }else{
+                    let gameOver = document.getElementById('game-over-loser');
+                    gameOver.style.display = "block"
+                }
             }
             this.reset();
         }    
@@ -285,11 +276,11 @@ function changeUserPosition(event){
     pong.players[0].pos.y = event.offsetY;
 }
 //creating the pong game and allowing user to move players paddel
-const pong = new Pong(canvas, menu);
+const pong = new Pong(canvas);
 canvas.addEventListener('mousemove', changeUserPosition);
 document.addEventListener('keyup', event => {
     if (event.code === 'Space') {
-        if(! menuOpen){ 
+        if(!MENUOPEN && !GAMEOVER){ 
             canvas.removeEventListener('mousemove', changeUserPosition);
         }else{
             canvas.addEventListener('mousemove', changeUserPosition); 
@@ -303,23 +294,22 @@ function startGame() {
 }
 
 function restartGame() {
-    console.log("restarting");
     pong.restart();
 }
+ 
 
-function easy () {
-    DIFFICULTY = 2;
-    pong.pause();
-}
-
-function medium () {
-    DIFFICULTY = 5;
-    pong.pause();
-}
-
-function hard () {
-    DIFFICULTY = 8;
-    pong.pause();
+function difficulty(value){
+    switch(value){
+        case 0:
+            DIFFICULTY = 2;
+            break;
+        case 1:
+            DIFFICULTY = 5;
+            break;
+        case 2:
+            DIFFICULTY = 8;
+            break;
+    }
 }
 
 
