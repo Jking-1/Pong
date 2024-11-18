@@ -1,9 +1,6 @@
 const canvas = document.getElementById('pong');
-// const menu = document.getElementById('menu');
 const WIDTH = canvas.width;
 const HEIGHT = canvas.height;
-// const MENUHEIGHT = menu.height;
-// const MENUWIDTH= menu.width;
 let DIFFICULTY =5;
 
 let MENUOPEN = false;
@@ -69,28 +66,21 @@ class Pong {
     //Pong game
     constructor(canvas, menu){
         //draw the background
-        //this._canvas = canvas;
         this.context = canvas.getContext('2d');
-
-        // this.menuContext = menu.getContext('2d');
-
         this.ball = new Ball;
 
         //initial ball position and random starting path
-
         this.ball.pos.x = WIDTH/2;
         this.ball.pos.y = HEIGHT/2;
 
         const heading = this.randomNumberBetween(0, 2 * Math.PI);
    
-        // this.ball.vel.x = 300 * (Math.random() > .5 ? 1 : -1);
-        // this.ball.vel.y = 300 * (Math.random() * 2 - 1);
         this.ball.vel.x = Math.cos(heading);
         this.ball.vel.y = Math.sin(heading); 
         this.ball.vel.len = 200;
 
         //score limit
-        this.scoreLimit = 1 ;
+        this.scoreLimit = 5 ;
 
         this.players = [
             new Player,
@@ -106,7 +96,7 @@ class Pong {
 
         let lastTime;
 
-        //useing time to calculate how much the screen should be updating
+        //using time to calculate how much the screen should be updating
         const callback = (millis) =>{
             if(lastTime){
                 this.update((millis - lastTime) / 1000);
@@ -127,7 +117,6 @@ class Pong {
             this.ball.vel.y = ballVelY; 
             MENUOPEN = false;
             canvas.style.display = "block"
-            // let resume = document.getElementById('resume');
             resume.style.display = "none";
             canvas.addEventListener('mousemove', changeUserPosition); 
 
@@ -163,8 +152,6 @@ class Pong {
         //draws ball and player and score elements
         this.context.fillStyle = '#000';
         this.context.fillRect(0,0,WIDTH, HEIGHT);
-        // this.menuContext.fillStyle = '#000';
-        // this.menuContext.fillRect(0,0,MENUWIDTH, MENUHEIGHT);
 
         this.drawRect(this.ball);
         
@@ -175,13 +162,9 @@ class Pong {
 
     drawScore(){
         //simple score drawing - two text elements showiong the players score with seperator in the middle
-
-        // var scale = window.devicePixelRatio; 
-        // console.log(scale)
         let player = this.players[0].score;
         let computer = this.players[1].score;
         let bar = "|"
-        // this.context.scale(scale, scale);
         this.context.font = '5vh Copperplate';
         this.context.fillStyle = '#fff';
         this.context.display = 'flex';
@@ -201,8 +184,6 @@ class Pong {
         //if ball goes out of bounds(player scores) reset the positioning of players and ball
         this.ball.pos.x = WIDTH/2;
         this.ball.pos.y = HEIGHT/2;
-        // this.ball.vel.x = 300 * (Math.random() > .5 ? 1 : -1);
-        // this.ball.vel.y = 300 * (Math.random() * 2 + 1);
         const heading = this.randomNumberBetween(0, 2 * Math.PI);
         this.ball.vel.x = Math.cos(heading);
         this.ball.vel.y = Math.sin(heading);
@@ -214,8 +195,6 @@ class Pong {
         this.players[1].score = 0;
         this.ball.pos.x = WIDTH/2;
         this.ball.pos.y = HEIGHT/2;
-        // this.ball.vel.x = 300 * (Math.random() > .5 ? 1 : -1);
-        // this.ball.vel.y = 300 * (Math.random() * 2 + 1);
         const heading = this.randomNumberBetween(0, 2 * Math.PI);
         this.ball.vel.x = Math.cos(heading);
         this.ball.vel.y = Math.sin(heading);
@@ -223,7 +202,6 @@ class Pong {
         MENUOPEN = false;
         GAMEOVER = false;
         canvas.style.display = "block"
-        // let resume = document.getElementById('resume');
         let resume = document.getElementById('resume');
         resume.style.display = "none";
         let gameOverLoser = document.getElementById('game-over-loser');
@@ -262,7 +240,6 @@ class Pong {
         //increase difficulty value to make game harder
         const difficulty = 5;
         this.players[1].pos.y += DIFFICULTY * deltaTime * (this.ball.pos.y - this.players[1].pos.y);
-        //this.players[1].pos.y = this.ball.pos.y;
         this.players.forEach(player => {
             this.collide(player, this.ball);
         })
@@ -311,26 +288,3 @@ function difficulty(value){
             break;
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// for making the ball a circle 
-
-// context.beginPath();
-// context.arc(10, 10, 10, 0, 2*Math.PI);
-// context.fillStyle = '#fff';
-// context.fill();
