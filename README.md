@@ -1,5 +1,5 @@
 # Pong 
-This is a simple single-player Poing game, played against the computer.
+This is a single-player Poing game, played against the computer.
 
 ## Instructions
 
